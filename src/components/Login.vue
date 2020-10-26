@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import axios from "@/api/axios";
 export default {
   data() {
     return {
@@ -73,23 +72,21 @@ export default {
           return;
         } else {
           //bool值为true 校验成功
-        let {data:res}= await axios.request({
+        let {data:res}= await this.$http.request({
             url: "/login",
             method: "post",
            data:{
              ...logindata
            }  
           });
-          console.log(res)
           if(res.meta.status==200){
             //登录成功跳转到主页
              this.$message.success({message:'登录成功',duration:1000})
-             console.log(res.data.token)
              window.sessionStorage.setItem('token',res.data.token)
               this.$router.push('/home')
           }else{
             //登录失败
-              return this.$message.error('登录失败')
+               this.$message.error('登录失败')
             
           }
         }
