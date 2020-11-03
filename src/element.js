@@ -5,7 +5,7 @@ import { Button, Form, FormItem, Input,
      Main, Menu, Submenu, MenuItem, Breadcrumb,
       BreadcrumbItem, Card ,Row,Col,
     Table,TableColumn,Switch,Tooltip,
-    Pagination} from 'element-ui'
+    Pagination,Dialog,MessageBox} from 'element-ui'
 //css样式
 import 'element-ui/lib/theme-chalk/index.css';
 
@@ -13,6 +13,7 @@ Vue.use(Button)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Input)
+//提示信息
 Vue.prototype.$message = Message
 Vue.use(Container)
 Vue.use(Header)
@@ -31,4 +32,6 @@ Vue.use(TableColumn)
 Vue.use(Switch)
 Vue.use(Tooltip)
 Vue.use(Pagination)
-
+Vue.use(Dialog)
+//提示框
+Vue.prototype.$confirm=MessageBox.confirm
