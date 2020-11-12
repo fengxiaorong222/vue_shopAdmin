@@ -73,6 +73,7 @@
                 size="mini"
                 type="warning"
                 icon="el-icon-setting"
+                @click="showSetRoleDialog(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -153,7 +154,34 @@
         <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- 删除用户的对话框 -->
+    <!-- 分配角色的对话框 -->
+    <el-dialog
+  title="分配角色"
+  :visible.sync="SetRoleDialogVisible"
+  width="50%"
+  @close="closeSetRoleDialog"
+>
+  <p>当前的用户:{{SetRoleinfo.username}}</p>
+  <p>当前的角色:{{SetRoleinfo.role_name}}</p>
+  <p>
+    分配新角色
+  <el-select v-model="select_id" 
+   placeholder="请选择"
+
+ >
+    <el-option
+      v-for="item in SetRole_options"
+      :key="item.id"
+      :label="item.roleName"
+      :value="item.id">
+    </el-option>
+  </el-select>
+  </p>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="closeSetRoleDialog">取 消</el-button>
+    <el-button type="primary" @click="SetRole()">确 定</el-button>
+  </span>
+</el-dialog>
   </div>
 </template>
 
@@ -194,6 +222,14 @@ export default {
       addDialogVisible: false,
       //编辑用户对话框隐藏显示
       editDialogVisible: false,
+      //分配角色对话框隐藏显示
+      SetRoleDialogVisible:false,
+      //分配角色对话框数据
+      SetRoleinfo:{},
+      //分配角色对话框下拉选项
+      SetRole_options:[],
+      //当前选中的角色id
+      select_id:"",
       //添加用户的表单数据
       addForm: {
         username: "",
@@ -434,6 +470,62 @@ export default {
           this.$message.info("已取消删除!");
         });
     },
+    /* 分配角色对话框 */
+   async showSetRoleDialog(row){
+      this.SetRoleinfo=row
+     const {data:res}=await this.$http.request({
+        url:"/roles",
+        method:"get",
+        headers: {
+          Authorization: sessionStorage.getItem("token"),
+        }
+      })
+      // console.log(row)
+      if(res.meta.status==200){
+        this.SetRole_options=res.data
+        //获取角色列表成功
+        this.$message.success(res.meta.msg)
+          this.SetRoleDialogVisible=true
+       
+      }else{
+          this.$message.error(res.meta.msg)
+      }
+     
+    },
+     /* 分配角色 */
+    async SetRole(){
+      if(!this.select_id){
+      return this.$message.error('还没有选择分配的新角色！')
+      }
+      /* 
+      用户id SetRoleinfo.id
+      角色id this.select_id
+      */
+    const {data:res}=await this.$http.request({
+       url:`users/${this.SetRoleinfo.id}/role`,
+       method:'put',
+            headers: {
+              Authorization: sessionStorage.getItem("token"),
+            },
+            data:{
+              rid:this.select_id
+            }
+     })
+     if(res.meta.status==200){
+       this.$message.success(res.meta.msg)
+       this.getUserlist()
+       this.SetRoleDialogVisible=false
+     }else{
+       this.$message.error(res.meta.msg)
+     }
+     
+     },
+    /* 关闭分配角色选项框 */
+    closeSetRoleDialog(){
+      this.select_id=''
+      this.SetRoleinfo=''
+      this.SetRoleDialogVisible=false
+    }
   },
 };
 </script>
